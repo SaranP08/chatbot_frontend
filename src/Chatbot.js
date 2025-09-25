@@ -7,7 +7,7 @@ import {
   Globe,
 } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://chatbot-backend-1-u1mi.onrender.com";
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
