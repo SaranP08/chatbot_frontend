@@ -7,7 +7,8 @@ import {
   Globe,
 } from "lucide-react";
 
-const API_BASE_URL = "https://chatbot-backend-1-u1mi.onrender.com";
+// const API_BASE_URL = "https://chatbot-backend-1-u1mi.onrender.com";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -24,6 +25,7 @@ const ChatBot = () => {
   const [isTranslating, setIsTranslating] = useState(false);
   const [hasRecommenderHistory, setHasRecommenderHistory] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [translatingIndex, setTranslatingIndex] = useState(null);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -72,50 +74,62 @@ const ChatBot = () => {
   }, []);
 
   // Translate recommendations
+  // Translate recommendations sequentially (one by one)
   useEffect(() => {
-    const translateRecommendations = async () => {
+    const translateSequentially = async () => {
       if (!recommendations.length) {
         setTranslatedRecommendations([]);
         return;
       }
+
       if (selectedLanguage === "en") {
         setTranslatedRecommendations(recommendations);
         return;
       }
+
       setIsTranslating(true);
-      try {
-        const translated = await Promise.all(
-          recommendations.map(async (rec) => {
-            try {
-              const response = await fetch(`${API_BASE_URL}/translate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  text: rec,
-                  target_lang: selectedLanguage,
-                  source_lang: "en",
-                }),
-              });
-              if (response.ok) {
-                const data = await response.json();
-                return data.translated_text || rec;
-              }
-              return rec;
-            } catch (error) {
-              console.error("Error translating recommendation:", error);
-              return rec;
-            }
-          })
-        );
-        setTranslatedRecommendations(translated);
-      } catch (error) {
-        console.error("Error translating recommendations:", error);
-        setTranslatedRecommendations(recommendations);
-      } finally {
-        setIsTranslating(false);
+      setTranslatedRecommendations([]);
+
+      for (let i = 0; i < recommendations.length; i++) {
+        const rec = recommendations[i];
+        setTranslatedRecommendations((prev) => [...prev, ""]); // placeholder
+        setTranslatingIndex(i); // mark this recommendation as translating
+
+        let translated = rec;
+        try {
+          const response = await fetch(`${API_BASE_URL}/translate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: rec,
+              target_lang: selectedLanguage,
+              source_lang: "en",
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            translated = data.translated_text || rec;
+          }
+        } catch (err) {
+          console.error("Translation error:", err);
+        }
+
+        // replace the placeholder with actual translation
+        setTranslatedRecommendations((prev) => {
+          const copy = [...prev];
+          copy[i] = translated;
+          return copy;
+        });
+
+        setTranslatingIndex(null); // done translating this one
+        await new Promise((resolve) => setTimeout(resolve, 50)); // allow render
       }
+
+      setIsTranslating(false);
     };
-    translateRecommendations();
+
+    translateSequentially();
   }, [recommendations, selectedLanguage]);
 
   // Keyboard shortcut to open sidebar
@@ -413,10 +427,14 @@ const ChatBot = () => {
                         recommendations[index]
                       )
                     }
-                    className="p-2 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 text-slate-200 text-sm leading-relaxed"
+                    className="p-4 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 text-slate-200 text-sm leading-relaxed flex items-center justify-start gap-2"
                     disabled={isLoading}
                   >
-                    {translatedRec}
+                    {translatingIndex === index ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      translatedRec
+                    )}
                   </button>
                 ))}
               </div>
