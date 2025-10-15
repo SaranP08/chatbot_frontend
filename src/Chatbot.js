@@ -73,7 +73,6 @@ const ChatBot = () => {
     initializeApp();
   }, []);
 
-  // Translate recommendations
   // Translate recommendations sequentially (one by one)
   useEffect(() => {
     const translateSequentially = async () => {
@@ -316,13 +315,18 @@ const ChatBot = () => {
       )}
 
       {/* Main Chat Area */}
+      {/* 
+        LAYOUT FIX: 
+        - Added 'h-screen' to make the container full height.
+        - This container is a flex-column, allowing us to pin the header and input bar.
+      */}
       <div
-        className={`flex-1 flex flex-col bg-slate-800 transition-all duration-300 ${
+        className={`flex-1 h-screen flex flex-col bg-slate-800 transition-all duration-300 ${
           isSidebarOpen ? "ml-80" : "ml-0"
         }`}
       >
-        {/* Header */}
-        <div className="p-6 border-b border-slate-600">
+        {/* Header - Added flex-shrink-0 */}
+        <div className="p-6 border-b border-slate-600 flex-shrink-0">
           <h1 className="text-3xl font-bold text-white mb-2">
             🌾 Sat2Farm AI Assistant
           </h1>
@@ -332,118 +336,125 @@ const ChatBot = () => {
           </p>
         </div>
 
-        {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-slate-400">
-                <MessageCircle
-                  size={64}
-                  className="mx-auto mb-4 text-slate-500"
-                />
-                <h2 className="text-xl font-medium mb-2 text-slate-300">
-                  Welcome to Sat2Farm AI!
-                </h2>
-                <p className="text-lg">
-                  Ask me a question or select one from the frequently asked
-                  questions below.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4 max-w-4xl mx-auto">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-2xl px-6 py-4 rounded-2xl ${
-                      message.role === "user"
-                        ? "bg-blue-600 text-white ml-12"
-                        : "bg-slate-700 text-slate-200 mr-12"
-                    }`}
-                  >
-                    <p className="leading-relaxed">{message.content}</p>
-                  </div>
+        {/* 
+          LAYOUT FIX:
+          - This new wrapper div will take up the remaining space ('flex-1') and become scrollable ('overflow-y-auto').
+          - It contains both the chat messages and the recommendations.
+        */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Chat Messages - Removed 'flex-1' and 'overflow-y-auto' from here */}
+          <div className="p-6">
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-slate-400">
+                  <MessageCircle
+                    size={64}
+                    className="mx-auto mb-4 text-slate-500"
+                  />
+                  <h2 className="text-xl font-medium mb-2 text-slate-300">
+                    Welcome to Sat2Farm AI!
+                  </h2>
+                  <p className="text-lg">
+                    Ask me a question or select one from the frequently asked
+                    questions below.
+                  </p>
                 </div>
-              ))}
-
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-slate-700 text-slate-200 max-w-2xl px-6 py-4 rounded-2xl mr-12">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-        </div>
-
-        {/* FAQ / Recommendations */}
-        <div className="border-t border-slate-600 bg-slate-750">
-          <div className="p-6 max-w-4xl mx-auto">
-            <h3 className="text-lg font-medium text-white mb-4">
-              Frequently Asked Questions:
-            </h3>
-            {!isInitialized || isTranslating ? (
-              <div className="flex justify-center items-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
-                {isTranslating && (
-                  <span className="ml-2 text-slate-400">Translating...</span>
-                )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {hasRecommenderHistory && (
-                  <button
-                    onClick={() => handleRecommendationClick("go_back")}
-                    className="p-4 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 flex items-center gap-2 text-slate-200"
-                  >
-                    <ArrowLeft size={16} />
-                    Back to previous questions
-                  </button>
-                )}
-
-                {translatedRecommendations.map((translatedRec, index) => (
-                  <button
+              <div className="space-y-4 max-w-4xl mx-auto">
+                {messages.map((message, index) => (
+                  <div
                     key={index}
-                    onClick={() =>
-                      handleRecommendationClick(
-                        translatedRec,
-                        recommendations[index]
-                      )
-                    }
-                    className="p-4 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 text-slate-200 text-sm leading-relaxed flex items-center justify-start gap-2"
-                    disabled={isLoading}
+                    className={`flex ${
+                      message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                   >
-                    {translatingIndex === index ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      translatedRec
-                    )}
-                  </button>
+                    <div
+                      className={`max-w-2xl px-6 py-4 rounded-2xl ${
+                        message.role === "user"
+                          ? "bg-blue-600 text-white ml-12"
+                          : "bg-slate-700 text-slate-200 mr-12"
+                      }`}
+                    >
+                      <p className="leading-relaxed">{message.content}</p>
+                    </div>
+                  </div>
                 ))}
+
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-slate-700 text-slate-200 max-w-2xl px-6 py-4 rounded-2xl mr-12">
+                      <div className="flex space-x-2">
+                        <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                        <div
+                          className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
               </div>
             )}
           </div>
+
+          {/* FAQ / Recommendations - Now inside the scrollable wrapper */}
+          <div className="border-t border-slate-600 bg-slate-750">
+            <div className="p-6 max-w-4xl mx-auto">
+              <h3 className="text-lg font-medium text-white mb-4">
+                Frequently Asked Questions:
+              </h3>
+              {!isInitialized || isTranslating ? (
+                <div className="flex justify-center items-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
+                  {isTranslating && (
+                    <span className="ml-2 text-slate-400">Translating...</span>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {hasRecommenderHistory && (
+                    <button
+                      onClick={() => handleRecommendationClick("go_back")}
+                      className="p-4 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 flex items-center gap-2 text-slate-200"
+                    >
+                      <ArrowLeft size={16} />
+                      Back to previous questions
+                    </button>
+                  )}
+
+                  {translatedRecommendations.map((translatedRec, index) => (
+                    <button
+                      key={index}
+                      onClick={() =>
+                        handleRecommendationClick(
+                          translatedRec,
+                          recommendations[index]
+                        )
+                      }
+                      className="p-4 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 text-slate-200 text-sm leading-relaxed flex items-center justify-start gap-2"
+                      disabled={isLoading}
+                    >
+                      {translatingIndex === index ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        translatedRec
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Chat Input */}
-        <div className="p-6 border-t border-slate-600">
+        {/* Chat Input - Added flex-shrink-0 */}
+        <div className="p-6 border-t border-slate-600 flex-shrink-0">
           <div className="max-w-4xl mx-auto flex gap-4">
             <input
               ref={inputRef}
