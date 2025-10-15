@@ -250,6 +250,32 @@ const ChatBot = () => {
     }
   };
 
+  // ---- NEW FUNCTION FOR "MORE QUESTIONS" ----
+  const handleMoreQuestionsClick = async () => {
+    setIsLoading(true); // Use the main loading state to prevent other actions
+    try {
+      const response = await fetch(`${API_BASE_URL}/recommendations/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "get_more",
+          user_language: selectedLanguage,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok && data.recommendations) {
+        // Append the new questions to the existing list
+        setRecommendations((prev) => [...prev, ...data.recommendations]);
+      } else {
+        throw new Error(data.detail || "Failed to get more questions");
+      }
+    } catch (error) {
+      console.error("Error fetching more questions:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleLanguageChange = (langCode, langName) => {
     setSelectedLanguage(langCode);
     setSelectedLanguageName(langName);
@@ -438,6 +464,17 @@ const ChatBot = () => {
                       )}
                     </button>
                   ))}
+
+                  {/* ---- NEW "MORE QUESTIONS" BUTTON ---- */}
+                  {recommendations.length > 0 && (
+                    <button
+                      onClick={handleMoreQuestionsClick}
+                      className="p-4 text-left bg-slate-600 hover:bg-slate-500 rounded-xl transition-all duration-200 text-slate-200 text-sm leading-relaxed flex items-center justify-start gap-2"
+                      disabled={isLoading}
+                    >
+                      More Questions...
+                    </button>
+                  )}
                 </div>
               )}
             </div>
