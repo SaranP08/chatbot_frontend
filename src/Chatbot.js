@@ -308,24 +308,19 @@ const ChatBot = () => {
       {!isSidebarOpen && (
         <div
           onClick={() => setIsSidebarOpen(true)}
-          className="fixed top-1/2 left-0 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-r-lg cursor-pointer z-50 transition-all duration-300"
+          className="fixed top-6 left-0 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-r-lg cursor-pointer z-50 transition-all duration-300"
         >
           <ArrowRight size={20} />
         </div>
       )}
 
       {/* Main Chat Area */}
-      {/* 
-        LAYOUT FIX: 
-        - Added 'h-screen' to make the container full height.
-        - This container is a flex-column, allowing us to pin the header and input bar.
-      */}
       <div
         className={`flex-1 h-screen flex flex-col bg-slate-800 transition-all duration-300 ${
           isSidebarOpen ? "ml-80" : "ml-0"
         }`}
       >
-        {/* Header - Added flex-shrink-0 */}
+        {/* Header */}
         <div className="p-6 border-b border-slate-600 flex-shrink-0">
           <h1 className="text-3xl font-bold text-white mb-2">
             🌾 Sat2Farm AI Assistant
@@ -336,13 +331,9 @@ const ChatBot = () => {
           </p>
         </div>
 
-        {/* 
-          LAYOUT FIX:
-          - This new wrapper div will take up the remaining space ('flex-1') and become scrollable ('overflow-y-auto').
-          - It contains both the chat messages and the recommendations.
-        */}
+        {/* Scrolling Wrapper for Messages and Recommendations */}
         <div className="flex-1 overflow-y-auto">
-          {/* Chat Messages - Removed 'flex-1' and 'overflow-y-auto' from here */}
+          {/* Chat Messages */}
           <div className="p-6">
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
@@ -403,7 +394,7 @@ const ChatBot = () => {
             )}
           </div>
 
-          {/* FAQ / Recommendations - Now inside the scrollable wrapper */}
+          {/* FAQ / Recommendations */}
           <div className="border-t border-slate-600 bg-slate-750">
             <div className="p-6 max-w-4xl mx-auto">
               <h3 className="text-lg font-medium text-white mb-4">
@@ -453,7 +444,7 @@ const ChatBot = () => {
           </div>
         </div>
 
-        {/* Chat Input - Added flex-shrink-0 */}
+        {/* Chat Input */}
         <div className="p-6 border-t border-slate-600 flex-shrink-0">
           <div className="max-w-4xl mx-auto flex gap-4">
             <input
