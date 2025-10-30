@@ -9,7 +9,8 @@ import {
 
 // const API_BASE_URL = "http://127.0.0.1:8000";
 // const API_BASE_URL = "https://saran08-chatbot-backend.hf.space";
-const API_BASE_URL = "https://saran08-rag-llm-chatbot-backend.hf.space";
+// const API_BASE_URL = "https://saran08-rag-llm-chatbot-backend.hf.space";
+const API_BASE_URL = "https://chatbot-backend-1-7hct.onrender.com";
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
