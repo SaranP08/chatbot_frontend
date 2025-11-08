@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 
 // const API_BASE_URL = "http://127.0.0.1:8000";
-// const API_BASE_URL = "https://saran08-chatbot-backend.hf.space";
-const API_BASE_URL = "https://saran08-rag-llm-chatbot-backend.hf.space";
+const API_BASE_URL = "https://saran08-chatbot-backend.hf.space";
+// const API_BASE_URL = "https://saran08-rag-llm-chatbot-backend.hf.space";
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -92,8 +92,8 @@ const ChatBot = () => {
 
       for (let i = 0; i < recommendations.length; i++) {
         const rec = recommendations[i];
-        setTranslatedRecommendations((prev) => [...prev, ""]); // placeholder
-        setTranslatingIndex(i); // mark this recommendation as translating
+        setTranslatedRecommendations((prev) => [...prev, ""]);
+        setTranslatingIndex(i);
 
         let translated = rec;
         try {
