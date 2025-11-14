@@ -7,9 +7,10 @@ import {
   Globe,
 } from "lucide-react";
 
-// API for FAQ clicks and related actions ('go_back', 'get_more')
+// ---- MODIFIED: Define both API base URLs ----
+// API for FAQ clicks and related functions (initial load, translate, etc.)
 const API_BASE_URL1 = "https://saran08-chatbot-backend.hf.space";
-// API for user-typed questions AND for initial data loading (languages, recommendations, translations)
+// API for user-typed questions
 const API_BASE_URL2 = "https://saran08-rag-llm-chatbot-backend.hf.space";
 
 const ChatBot = () => {
@@ -43,8 +44,8 @@ const ChatBot = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // ---- MODIFIED: Using API_BASE_URL2 for initial app data ----
-        const langResponse = await fetch(`${API_BASE_URL2}/languages`);
+        // ---- MODIFIED: Using API_BASE_URL1 for recommendation system functions ----
+        const langResponse = await fetch(`${API_BASE_URL1}/languages`);
         if (langResponse.ok) {
           const langData = await langResponse.json();
           if (
@@ -55,9 +56,8 @@ const ChatBot = () => {
           }
         }
 
-        // ---- MODIFIED: Using API_BASE_URL2 for initial app data ----
         const recResponse = await fetch(
-          `${API_BASE_URL2}/recommendations/initial`
+          `${API_BASE_URL1}/recommendations/initial`
         );
         if (recResponse.ok) {
           const recData = await recResponse.json();
@@ -100,8 +100,8 @@ const ChatBot = () => {
 
         let translated = rec;
         try {
-          // ---- MODIFIED: Using API_BASE_URL2 for translation ----
-          const response = await fetch(`${API_BASE_URL2}/translate`, {
+          // ---- MODIFIED: Using API_BASE_URL1 for translation ----
+          const response = await fetch(`${API_BASE_URL1}/translate`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -147,7 +147,7 @@ const ChatBot = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // ---- UNCHANGED: Sends TYPED questions to API_BASE_URL2 ----
+  // ---- MODIFIED: This function now sends to API_BASE_URL2 for typed questions ----
   const sendMessage = async (messageText = null) => {
     const textToSend = messageText || inputValue.trim();
     if (!textToSend) return;
@@ -158,6 +158,7 @@ const ChatBot = () => {
     if (!messageText) setInputValue("");
 
     try {
+      // ---- CHANGE: Using API_BASE_URL2 ----
       const response = await fetch(`${API_BASE_URL2}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -193,14 +194,14 @@ const ChatBot = () => {
     }
   };
 
-  // ---- UNCHANGED: Sends FAQ CLICKS to API_BASE_URL1 ----
+  // ---- MODIFIED: This function now sends to API_BASE_URL1 for FAQ clicks ----
   const handleRecommendationClick = async (
     displayText,
     originalEnglishText
   ) => {
     if (displayText === "go_back") {
       try {
-        // This action is part of the FAQ system, so it uses API_BASE_URL1
+        // ---- MODIFIED: Using API_BASE_URL1 for recommendation system actions ----
         const response = await fetch(
           `${API_BASE_URL1}/recommendations/action`,
           {
@@ -227,6 +228,7 @@ const ChatBot = () => {
     setIsLoading(true);
     setMessages((prev) => [...prev, { role: "user", content: displayText }]);
     try {
+      // ---- CHANGE: Using API_BASE_URL1 ----
       const response = await fetch(`${API_BASE_URL1}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -262,11 +264,10 @@ const ChatBot = () => {
     }
   };
 
-  // ---- UNCHANGED: Sends 'More Questions' action to API_BASE_URL1 ----
   const handleMoreQuestionsClick = async () => {
     setIsLoading(true);
     try {
-      // This action is part of the FAQ system, so it uses API_BASE_URL1
+      // ---- MODIFIED: Using API_BASE_URL1 for recommendation system actions ----
       const response = await fetch(`${API_BASE_URL1}/recommendations/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
