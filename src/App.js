@@ -1,5 +1,5 @@
 import React from "react";
-import ChatBot from "./Chatbot.js"; // Assuming you save the artifact as ChatBot.js
+import ChatBot from "./Chatbot.js";
 
 function App() {
   return (

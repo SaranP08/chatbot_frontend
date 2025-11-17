@@ -7,7 +7,6 @@ import {
   Globe,
 } from "lucide-react";
 
-// ---- MODIFIED: Define both API base URLs ----
 // API for FAQ clicks and related functions (initial load, translate, etc.)
 const API_BASE_URL1 = "https://saran08-chatbot-backend.hf.space";
 // API for user-typed questions
@@ -33,18 +32,15 @@ const ChatBot = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Initialize languages and recommendations
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // ---- MODIFIED: Using API_BASE_URL1 for recommendation system functions ----
         const langResponse = await fetch(`${API_BASE_URL1}/languages`);
         if (langResponse.ok) {
           const langData = await langResponse.json();
@@ -77,7 +73,6 @@ const ChatBot = () => {
     initializeApp();
   }, []);
 
-  // Translate recommendations sequentially (one by one)
   useEffect(() => {
     const translateSequentially = async () => {
       if (!recommendations.length) {
@@ -100,7 +95,6 @@ const ChatBot = () => {
 
         let translated = rec;
         try {
-          // ---- MODIFIED: Using API_BASE_URL1 for translation ----
           const response = await fetch(`${API_BASE_URL1}/translate`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -135,7 +129,6 @@ const ChatBot = () => {
     translateSequentially();
   }, [recommendations, selectedLanguage]);
 
-  // Keyboard shortcut to open sidebar
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === "l") {
@@ -147,7 +140,6 @@ const ChatBot = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // ---- MODIFIED: This function now sends to API_BASE_URL2 for typed questions ----
   const sendMessage = async (messageText = null) => {
     const textToSend = messageText || inputValue.trim();
     if (!textToSend) return;
@@ -158,7 +150,6 @@ const ChatBot = () => {
     if (!messageText) setInputValue("");
 
     try {
-      // ---- CHANGE: Using API_BASE_URL2 ----
       const response = await fetch(`${API_BASE_URL2}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -194,14 +185,12 @@ const ChatBot = () => {
     }
   };
 
-  // ---- MODIFIED: This function now sends to API_BASE_URL1 for FAQ clicks ----
   const handleRecommendationClick = async (
     displayText,
     originalEnglishText
   ) => {
     if (displayText === "go_back") {
       try {
-        // ---- MODIFIED: Using API_BASE_URL1 for recommendation system actions ----
         const response = await fetch(
           `${API_BASE_URL1}/recommendations/action`,
           {
@@ -228,7 +217,6 @@ const ChatBot = () => {
     setIsLoading(true);
     setMessages((prev) => [...prev, { role: "user", content: displayText }]);
     try {
-      // ---- CHANGE: Using API_BASE_URL1 ----
       const response = await fetch(`${API_BASE_URL1}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -267,7 +255,6 @@ const ChatBot = () => {
   const handleMoreQuestionsClick = async () => {
     setIsLoading(true);
     try {
-      // ---- MODIFIED: Using API_BASE_URL1 for recommendation system actions ----
       const response = await fetch(`${API_BASE_URL1}/recommendations/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
