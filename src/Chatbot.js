@@ -26,13 +26,8 @@ const ChatBot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [hasRecommenderHistory, setHasRecommenderHistory] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [translatingIndex, setTranslatingIndex] = useState(null);
-
-  // New state for sidebar hover and pin logic
-  const [isSidebarPinned, setIsSidebarPinned] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  // Derived state: sidebar is open if it's pinned OR the user is hovering over it
-  const isSidebarOpen = isSidebarPinned || isHovering;
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -138,8 +133,7 @@ const ChatBot = () => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.key === "l") {
         e.preventDefault();
-        // Toggle the pinned state with the keyboard shortcut
-        setIsSidebarPinned((prev) => !prev);
+        setIsSidebarOpen(true);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -301,14 +295,11 @@ const ChatBot = () => {
         className={`fixed top-0 left-0 h-full bg-slate-700 border-r border-slate-600 flex flex-col transition-all duration-300 z-40 ${
           isSidebarOpen ? "w-80" : "w-0 overflow-hidden"
         }`}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
       >
         <div className="p-4 border-b border-slate-600 flex justify-end">
           <button
-            onClick={() => setIsSidebarPinned(false)} // Unpin the sidebar
+            onClick={() => setIsSidebarOpen(false)}
             className="text-slate-300 hover:text-white transition-colors"
-            title="Unpin Sidebar (will close on mouse out)"
           >
             <ArrowLeft size={20} />
           </button>
@@ -342,10 +333,8 @@ const ChatBot = () => {
       {/* Sidebar handle */}
       {!isSidebarOpen && (
         <div
-          onClick={() => setIsSidebarPinned(true)} // Pin the sidebar on click
-          onMouseEnter={() => setIsHovering(true)} // Show sidebar on hover
+          onClick={() => setIsSidebarOpen(true)}
           className="fixed top-6 left-0 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-r-lg cursor-pointer z-50 transition-all duration-300"
-          title="Open Sidebar (Ctrl+L)"
         >
           <ArrowRight size={20} />
         </div>
